@@ -6,7 +6,7 @@ namespace Recruiter.Domain.Models;
 /// Represents a column on a recruiter's kanban board for organizing jobs
 /// Each recruiter can have multiple columns with custom names and visibility settings
 /// </summary>
-public class KanbanBoardColumn : BasicBaseDbModel
+public class KanbanBoardColumn : BaseDbModel
 {
     /// <summary>Recruiter ID (FK to UserProfile)</summary>
     [Required]

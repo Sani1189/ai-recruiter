@@ -30,7 +30,8 @@ public class KanbanBoardColumnService : IKanbanBoardColumnService
 
     public async Task<IEnumerable<KanbanBoardColumnDto>> GetColumnsByRecruiterAsync(Guid recruiterId)
     {
-        var columns = await _repository.ListAsync(c => c.RecruiterId == recruiterId);
+        var spec = new KanbanBoardColumnByRecruiterSpec(recruiterId);
+        var columns = await _repository.ListAsync(spec);
         var ordered = columns.OrderBy(c => c.Sequence).ToList();
         return _mapper.Map<IEnumerable<KanbanBoardColumnDto>>(ordered);
     }
@@ -38,7 +39,8 @@ public class KanbanBoardColumnService : IKanbanBoardColumnService
     public async Task<KanbanBoardColumnDto> CreateColumnAsync(Guid recruiterId, KanbanBoardColumnDto dto)
     {
         // Get the highest sequence number and add 1
-        var existingColumns = await _repository.ListAsync(c => c.RecruiterId == recruiterId);
+        var spec = new KanbanBoardColumnByRecruiterSpec(recruiterId);
+        var existingColumns = await _repository.ListAsync(spec);
         var maxSequence = existingColumns.Any() ? existingColumns.Max(c => c.Sequence) : 0;
 
         var newColumn = new KanbanBoardColumn
@@ -48,8 +50,8 @@ public class KanbanBoardColumnService : IKanbanBoardColumnService
             ColumnName = dto.ColumnName,
             Sequence = maxSequence + 1,
             IsVisible = true,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
         };
 
         await _repository.AddAsync(newColumn);
@@ -64,7 +66,7 @@ public class KanbanBoardColumnService : IKanbanBoardColumnService
 
         column.ColumnName = dto.ColumnName;
         column.IsVisible = dto.IsVisible;
-        column.UpdatedAt = DateTime.UtcNow;
+        column.UpdatedAt = DateTimeOffset.UtcNow;
 
         await _repository.UpdateAsync(column);
         return _mapper.Map<KanbanBoardColumnDto>(column);
@@ -82,7 +84,8 @@ public class KanbanBoardColumnService : IKanbanBoardColumnService
 
     public async Task<bool> ReorderColumnsAsync(Guid recruiterId, List<(Guid ColumnId, int Sequence)> ordering)
     {
-        var columns = await _repository.ListAsync(c => c.RecruiterId == recruiterId);
+        var spec = new KanbanBoardColumnByRecruiterSpec(recruiterId);
+        var columns = await _repository.ListAsync(spec);
         
         foreach (var (columnId, sequence) in ordering)
         {
@@ -90,7 +93,7 @@ public class KanbanBoardColumnService : IKanbanBoardColumnService
             if (column != null)
             {
                 column.Sequence = sequence;
-                column.UpdatedAt = DateTime.UtcNow;
+                column.UpdatedAt = DateTimeOffset.UtcNow;
                 await _repository.UpdateAsync(column);
             }
         }

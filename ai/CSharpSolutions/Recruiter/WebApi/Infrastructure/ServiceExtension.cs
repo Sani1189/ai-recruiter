@@ -98,6 +98,7 @@ public static class ServiceExtension
         services.AddRepository<Score>();
         services.AddRepository<Feedback>();
         services.AddRepository<JobPostStepAssignment>();
+        services.AddRepository<KanbanBoardColumn>();
         services.AddRepository<Domain.Models.Education>();
         services.AddRepository<Domain.Models.Skill>();
         services.AddRepository<Domain.Models.Experience>();
@@ -158,6 +159,7 @@ public static class ServiceExtension
         services.AddScoped<IJobPostStepService, JobPostStepService>();
         services.AddScoped<IJobPostStepAssignmentService, JobPostStepAssignmentService>();
         services.AddScoped<IJobPostCandidateService, JobPostCandidateService>();
+        services.AddScoped<IKanbanBoardColumnService, KanbanBoardColumnService>();
         
         // Register JobApplication services
         services.AddScoped<IJobApplicationService, JobApplicationService>();
