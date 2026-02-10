@@ -18,6 +18,7 @@ public class RecruiterDbContext : DbContext
     public DbSet<JobPost> JobPosts { get; set; } = null!;
     public DbSet<JobPostStep> JobPostSteps { get; set; } = null!;
     public DbSet<JobPostStepAssignment> JobPostStepAssignments { get; set; } = null!;
+    public DbSet<KanbanBoardColumn> KanbanBoardColumns { get; set; } = null!;
     public DbSet<CountryExposureSet> CountryExposureSets { get; set; } = null!;
     public DbSet<CountryExposureSetCountry> CountryExposureSetCountries { get; set; } = null!;
 
@@ -136,6 +137,19 @@ public class RecruiterDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(50)
                 .HasConversion<string>();
+            entity.Property(e => e.Industry).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.IntroText).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Requirements).IsRequired();
+            entity.Property(e => e.WhatWeOffer).IsRequired();
+            entity.Property(e => e.CompanyInfo).IsRequired();
+            entity.Property(e => e.CurrentBoardColumnId);
+
+            entity
+                .HasOne(e => e.CurrentBoardColumn)
+                .WithMany(c => c.Jobs)
+                .HasForeignKey(e => e.CurrentBoardColumnId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             entity.Property(e => e.OriginCountryCode)
                 .HasMaxLength(2)
                 .IsFixedLength();
@@ -169,6 +183,32 @@ public class RecruiterDbContext : DbContext
                 .IsFixedLength();
 
             entity.HasData(CountrySeedData.GetAll());
+        });
+
+        // Configure KanbanBoardColumn entity
+        modelBuilder.Entity<KanbanBoardColumn>(entity =>
+        {
+            entity.ConfigureBasicBaseDbModelProperties();
+            
+            entity.Property(e => e.RecruiterId).IsRequired();
+            entity.Property(e => e.ColumnName).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.Sequence).IsRequired();
+            entity.Property(e => e.IsVisible).IsRequired().HasDefaultValue(true);
+
+            // Foreign key to UserProfile (Recruiter)
+            entity.HasOne(e => e.Recruiter)
+                .WithMany()
+                .HasForeignKey(e => e.RecruiterId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Relationship to JobPost
+            entity.HasMany(e => e.Jobs)
+                .WithOne(j => j.CurrentBoardColumn)
+                .HasForeignKey(j => j.CurrentBoardColumnId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Unique constraint on (RecruiterId, Sequence)
+            entity.HasIndex(e => new { e.RecruiterId, e.Sequence }).IsUnique();
         });
 
         // Configure JobPostStep entity

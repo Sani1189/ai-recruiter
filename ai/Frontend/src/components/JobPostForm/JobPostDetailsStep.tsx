@@ -241,6 +241,37 @@ export default function JobPostDetailsStep({ form }: JobPostDetailsStepProps) {
         />
       </div>
 
+      {/* Industry and Intro Text */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <FormField
+          control={form.control}
+          name="industry"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Industry *</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g., Technology, Finance, Healthcare" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="introText"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Intro Text *</FormLabel>
+              <FormControl>
+                <Input placeholder="Brief introduction for the job posting" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
       {/* Job Description */}
       <FormField
         control={form.control}
@@ -258,6 +289,72 @@ export default function JobPostDetailsStep({ form }: JobPostDetailsStepProps) {
             <FormDescription>
               Provide a detailed description of the role, responsibilities, and
               requirements.
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {/* Requirements */}
+      <FormField
+        control={form.control}
+        name="requirements"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Requirements *</FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="Enter the key requirements for this position..."
+                className="min-h-[100px]"
+                {...field}
+              />
+            </FormControl>
+            <FormDescription>
+              List the key skills and qualifications required.
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {/* What We Offer */}
+      <FormField
+        control={form.control}
+        name="whatWeOffer"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>What We Offer *</FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="Describe the benefits, compensation, and opportunities..."
+                className="min-h-[100px]"
+                {...field}
+              />
+            </FormControl>
+            <FormDescription>
+              Highlight what makes this role attractive.
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {/* Company Info */}
+      <FormField
+        control={form.control}
+        name="companyInfo"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Company Info *</FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="Tell us about your company..."
+                className="min-h-[100px]"
+                {...field}
+              />
+            </FormControl>
+            <FormDescription>
+              Provide information about your company culture and mission.
             </FormDescription>
             <FormMessage />
           </FormItem>

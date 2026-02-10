@@ -32,6 +32,27 @@ public class JobPostDto : VersionedBaseModelDto
     [Required]
     [MaxLength(2000)]
     public string JobDescription { get; set; } = string.Empty;
+
+    // NEW FIELDS FOR ENHANCED JOB POSTING
+    [Required]
+    [MaxLength(100)]
+    public string Industry { get; set; } = string.Empty;
+
+    [Required]
+    [MaxLength(500)]
+    public string IntroText { get; set; } = string.Empty;
+
+    [Required]
+    public string Requirements { get; set; } = string.Empty;
+
+    [Required]
+    public string WhatWeOffer { get; set; } = string.Empty;
+
+    [Required]
+    public string CompanyInfo { get; set; } = string.Empty;
+
+    /// <summary>Current kanban board column ID</summary>
+    public Guid? CurrentBoardColumnId { get; set; }
     
     public bool? PoliceReportRequired { get; set; }
 

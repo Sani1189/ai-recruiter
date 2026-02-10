@@ -226,4 +226,40 @@ public class JobController(
         var candidates = await _candidateService.GetAllCandidatesAsync();
         return Ok(candidates);
     }
+
+    /// <summary>
+    /// Move a job post to a specific kanban board column
+    /// </summary>
+    [HttpPut("{name}/{version}/move-to-column/{columnId}")]
+    [Authorize(Policy = "Admin")]
+    public async Task<ActionResult<JobPostDto>> MoveJobToColumn(string name, int version, Guid columnId)
+    {
+        var jobPost = await _jobPostService.GetByIdAsync(name, version);
+        if (jobPost == null)
+            return NotFound();
+
+        // Update the job post's current board column
+        jobPost.CurrentBoardColumnId = columnId;
+        var updated = await _jobPostOrchestrator.UpdateJobPostWithStepsAsync(jobPost);
+        
+        return Ok(updated);
+    }
+
+    /// <summary>
+    /// Get job posts grouped by kanban board columns
+    /// </summary>
+    [HttpGet("by-column/{recruiterId}")]
+    [Authorize(Policy = "Admin")]
+    public async Task<ActionResult<Dictionary<Guid, List<JobPostDto>>>> GetJobsByColumn(Guid recruiterId, [FromQuery] int page = 1, [FromQuery] int pageSize = 100)
+    {
+        var query = new JobPostListQueryDto { Page = page, PageSize = pageSize };
+        var jobPosts = await _jobPostService.GetListAsync(query);
+        
+        // Group by CurrentBoardColumnId
+        var grouped = jobPosts.Items
+            .GroupBy(j => j.CurrentBoardColumnId ?? Guid.Empty)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        return Ok(grouped);
+    }
 }

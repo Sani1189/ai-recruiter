@@ -25,6 +25,26 @@ public class JobPost : VersionedBaseDbModel
     [Required]
     public string JobDescription { get; set; } = string.Empty;
 
+    // NEW FIELDS FOR ENHANCED JOB POSTING
+    [Required]
+    public string Industry { get; set; } = string.Empty;
+
+    [Required]
+    public string IntroText { get; set; } = string.Empty;
+
+    [Required]
+    public string Requirements { get; set; } = string.Empty;
+
+    [Required]
+    public string WhatWeOffer { get; set; } = string.Empty;
+
+    [Required]
+    public string CompanyInfo { get; set; } = string.Empty;
+
+    /// <summary>Current board column this job is in (FK to KanbanBoardColumns)</summary>
+    public Guid? CurrentBoardColumnId { get; set; }
+    public virtual KanbanBoardColumn? CurrentBoardColumn { get; set; }
+
     public bool? PoliceReportRequired { get; set; }
 
     public Guid? TenantId { get; set; }

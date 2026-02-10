@@ -20,6 +20,30 @@ const JobPostDetails = z.object({
     .trim()
     .min(10, "Job description must be at least 10 characters")
     .max(2000, "Job description must be at most 2000 characters"),
+  // NEW FIELDS FOR ENHANCED JOB POSTING
+  industry: z
+    .string()
+    .trim()
+    .min(2, "Industry must be at least 2 characters")
+    .max(100, "Industry must be at most 100 characters"),
+  introText: z
+    .string()
+    .trim()
+    .min(10, "Intro text must be at least 10 characters")
+    .max(500, "Intro text must be at most 500 characters"),
+  requirements: z
+    .string()
+    .trim()
+    .min(10, "Requirements must be at least 10 characters"),
+  whatWeOffer: z
+    .string()
+    .trim()
+    .min(10, "What we offer must be at least 10 characters"),
+  companyInfo: z
+    .string()
+    .trim()
+    .min(10, "Company info must be at least 10 characters"),
+  currentBoardColumnId: z.string().uuid().optional().nullable(),
   minimumRequirements: z
     .array(
       z
