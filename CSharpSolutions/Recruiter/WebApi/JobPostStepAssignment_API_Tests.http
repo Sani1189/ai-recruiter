@@ -1,0 +1,273 @@
+### JobPostStepAssignment API Tests - Minimal Implementation
+### Clean endpoints matching the current controller implementation
+
+@baseUrl = http://localhost:5140
+@contentType = application/json
+
+### ===========================================
+### PREREQUISITES - Create JobPost and Steps First
+### ===========================================
+
+###
+# Create JobPost for testing assignments
+POST {{baseUrl}}/api/JobPost
+Content-Type: {{contentType}}
+
+{
+  "name": "TestJobPost",
+  "version": 1,
+  "jobTitle": "Test Developer",
+  "jobDescription": "Test job for assignment testing",
+  "jobType": "FullTime",
+  "experienceLevel": "Mid",
+  "maxAmountOfCandidatesRestriction": 5,
+  "minimumRequirements": ["Test requirement"],
+  "policeReportRequired": false
+}
+
+###
+# Create Step 1 for testing assignments
+POST {{baseUrl}}/api/JobPostStep
+Content-Type: {{contentType}}
+
+{
+  "name": "TestStep1",
+  "version": 1,
+  "stepNumber": 1,
+  "isInterview": false,
+  "stepType": "Screening",
+  "recruiterCompletesStepManually": true,
+  "interviewConfigurationName": null,
+  "interviewConfigurationVersion": null
+}
+
+###
+# Create Step 2 for testing assignments
+POST {{baseUrl}}/api/JobPostStep
+Content-Type: {{contentType}}
+
+{
+  "name": "TestStep2",
+  "version": 1,
+  "stepNumber": 2,
+  "isInterview": true,
+  "stepType": "Technical",
+  "recruiterCompletesStepManually": false,
+  "interviewConfigurationName": "TestConfig",
+  "interviewConfigurationVersion": 1
+}
+
+### ===========================================
+### BASIC ASSIGNMENT OPERATIONS
+### ===========================================
+
+###
+# Test 1: Assign step to job post
+POST {{baseUrl}}/api/JobPostStepAssignment
+Content-Type: {{contentType}}
+
+{
+  "jobPostName": "SoftwareEngineer",
+  "jobPostVersion": 1,
+  "stepNumber": 1,
+  "status": "pending",
+  "stepDetails": {
+    "name": "InitialScreening",
+    "version": 1,
+    "isInterview": true,
+    "stepType": "Screening",
+    "recruiterCompletesStepManually": true,
+    "interviewConfigurationName": null,
+    "interviewConfigurationVersion": null
+  }
+}
+
+###
+# Test 2: Assign another step to job post
+POST {{baseUrl}}/api/JobPostStepAssignment
+Content-Type: {{contentType}}
+
+{
+  "jobPostName": "TestJobPost",
+  "jobPostVersion": 1,
+  "stepNumber": 2,
+  "status": "pending",
+  "stepDetails": {
+    "name": "InitialScreening",
+    "version": 1,
+    "isInterview": false,
+    "stepType": "Screening",
+    "recruiterCompletesStepManually": true,
+    "interviewConfigurationName": null,
+    "interviewConfigurationVersion": null
+  }
+}
+
+###
+# Test 3: Get all step assignments for a job post
+GET {{baseUrl}}/api/JobPostStepAssignment/jobpost/TestJobPost/1
+
+###
+# Test 4: Update assignment status
+PUT {{baseUrl}}/api/JobPostStepAssignment/TestJobPost/1/TestStep1/1/status
+Content-Type: {{contentType}}
+
+"in_progress"
+
+###
+# Test 5: Update another assignment status
+PUT {{baseUrl}}/api/JobPostStepAssignment/TestJobPost/1/TestStep2/1/status
+Content-Type: {{contentType}}
+
+"completed"
+
+###
+# Test 6: Remove step assignment from job post
+DELETE {{baseUrl}}/api/JobPostStepAssignment/TestJobPost/1/TestStep1/1
+
+### ===========================================
+### ADDITIONAL TESTING SCENARIOS
+### ===========================================
+
+###
+# Test 7: Create JobPost with existing steps for more testing
+POST {{baseUrl}}/api/JobPost
+Content-Type: {{contentType}}
+
+{
+  "name": "AnotherTestJob",
+  "version": 1,
+  "jobTitle": "Another Test Developer",
+  "jobDescription": "Another test job for assignment testing",
+  "jobType": "Contract",
+  "experienceLevel": "Senior",
+  "maxAmountOfCandidatesRestriction": 3,
+  "minimumRequirements": ["Advanced test requirement"],
+  "policeReportRequired": true
+}
+
+###
+# Test 8: Assign multiple steps to new job post
+POST {{baseUrl}}/api/JobPostStepAssignment
+Content-Type: {{contentType}}
+
+{
+  "jobPostName": "AnotherTestJob",
+  "jobPostVersion": 1,
+  "stepNumber": 1,
+  "status": "pending",
+  "stepDetails": {
+    "name": "TestStep",
+    "version": 1,
+    "isInterview": true,
+    "stepType": "Screening",
+    "recruiterCompletesStepManually": true,
+    "interviewConfigurationName": null,
+    "interviewConfigurationVersion": null
+  }
+}
+
+###
+# Test 9: Get assignments for the new job post
+GET {{baseUrl}}/api/JobPostStepAssignment/jobpost/AnotherTestJob/1
+
+### ===========================================
+### ERROR TESTING
+### ===========================================
+
+###
+# Test 10: Assign step to non-existent job post
+POST {{baseUrl}}/api/JobPostStepAssignment
+Content-Type: {{contentType}}
+
+{
+  "jobPostName": "NonExistentJobPost",
+  "jobPostVersion": 1,
+  "stepNumber": 1,
+  "status": "pending",
+  "stepDetails": {
+    "name": "TestStep",
+    "version": 1,
+    "isInterview": true,
+    "stepType": "Screening",
+    "recruiterCompletesStepManually": true,
+    "interviewConfigurationName": null,
+    "interviewConfigurationVersion": null
+  }
+}
+
+###
+# Test 11: Assign non-existent step to job post
+POST {{baseUrl}}/api/JobPostStepAssignment
+Content-Type: {{contentType}}
+
+{
+  "jobPostName": "TestJobPost",
+  "jobPostVersion": 1,
+  "stepNumber": 1,
+  "status": "pending",
+  "stepDetails": {
+    "name": "NonExistentStep",
+    "version": 1,
+    "isInterview": true,
+    "stepType": "Screening",
+    "recruiterCompletesStepManually": true,
+    "interviewConfigurationName": null,
+    "interviewConfigurationVersion": null
+  }
+}
+
+###
+# Test 12: Get assignments for non-existent job post
+GET {{baseUrl}}/api/JobPostStepAssignment/jobpost/NonExistent/1
+
+###
+# Test 13: Update status for non-existent assignment
+PUT {{baseUrl}}/api/JobPostStepAssignment/NonExistent/1/NonExistent/1/status
+Content-Type: {{contentType}}
+
+"completed"
+
+###
+# Test 14: Delete non-existent assignment
+DELETE {{baseUrl}}/api/JobPostStepAssignment/NonExistent/1/NonExistent/1
+
+###
+# Test 15: Create assignment with invalid data
+POST {{baseUrl}}/api/JobPostStepAssignment
+Content-Type: {{contentType}}
+
+{
+  "jobPostName": "",
+  "jobPostVersion": 0,
+  "stepNumber": 0,
+  "status": "invalid_status",
+  "stepDetails": {
+    "name": "",
+    "version": 0,
+    "isInterview": true,
+    "stepType": "Screening",
+    "recruiterCompletesStepManually": true,
+    "interviewConfigurationName": null,
+    "interviewConfigurationVersion": null
+  }
+}
+
+### ===========================================
+### CLEANUP (Optional)
+### ===========================================
+
+###
+# Test 16: Clean up test data - Delete remaining assignments
+DELETE {{baseUrl}}/api/JobPostStepAssignment/TestJobPost/1/TestStep2/1
+DELETE {{baseUrl}}/api/JobPostStepAssignment/AnotherTestJob/1/TestStep1/1
+
+###
+# Test 17: Clean up test data - Delete test job posts
+DELETE {{baseUrl}}/api/JobPost/TestJobPost/1
+DELETE {{baseUrl}}/api/JobPost/AnotherTestJob/1
+
+###
+# Test 18: Clean up test data - Delete test steps
+DELETE {{baseUrl}}/api/JobPostStep/TestStep1/1
+DELETE {{baseUrl}}/api/JobPostStep/TestStep2/1

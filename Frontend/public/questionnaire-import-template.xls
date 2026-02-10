@@ -1,0 +1,300 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+          xmlns:o="urn:schemas-microsoft-com:office:office"
+          xmlns:x="urn:schemas-microsoft-com:office:excel"
+          xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+          xmlns:html="http://www.w3.org/TR/REC-html40">
+  <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+    <Title>Questionnaire Import Template</Title>
+    <Author>Recruiter Platform</Author>
+    <Created>2026-02-01T00:00:00Z</Created>
+  </DocumentProperties>
+
+  <Styles>
+    <Style ss:ID="Header">
+      <Font ss:Bold="1"/>
+      <Interior ss:Color="#E5E7EB" ss:Pattern="Solid"/>
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+      </Borders>
+    </Style>
+    <Style ss:ID="Hint">
+      <Font ss:Color="#6B7280" ss:Italic="1"/>
+      <Alignment ss:Vertical="Top" ss:WrapText="1"/>
+    </Style>
+    <Style ss:ID="Mono">
+      <Font ss:FontName="Consolas"/>
+    </Style>
+  </Styles>
+
+  <!--
+    SINGLE-SHEET IMPORT FORMAT (unlimited options):
+    - One row = one option row (or one row for non-option questions).
+    - A question is identified by (SectionOrder, QuestionOrder).
+    - Options belong to that question via (SectionOrder, QuestionOrder, OptionOrder).
+
+    Import context is provided by the app UI (not by this sheet):
+      - Scope (CreateTemplate | AppendToTemplate | AppendToSection)
+      - TemplateName / TemplateVersion
+      - TargetSectionOrder (for AppendToSection)
+      - TemplateType (for CreateTemplate)
+    This sheet contains ONLY the content rows (sections/questions/options).
+  -->
+
+  <Worksheet ss:Name="Import">
+    <Table ss:DefaultColumnWidth="120" ss:DefaultRowHeight="18">
+      <Row ss:AutoFitHeight="0" ss:Height="26">
+        <Cell ss:StyleID="Header"><Data ss:Type="String">SectionOrder</Data></Cell>
+        <Cell ss:StyleID="Header"><Data ss:Type="String">SectionTitle</Data></Cell>
+
+        <Cell ss:StyleID="Header"><Data ss:Type="String">QuestionOrder</Data></Cell>
+        <Cell ss:StyleID="Header"><Data ss:Type="String">QuestionType</Data></Cell>
+        <Cell ss:StyleID="Header"><Data ss:Type="String">IsRequired</Data></Cell>
+        <Cell ss:StyleID="Header"><Data ss:Type="String">QuestionTitle</Data></Cell>
+
+        <Cell ss:StyleID="Header"><Data ss:Type="String">TraitKey</Data></Cell>
+        <Cell ss:StyleID="Header"><Data ss:Type="String">Ws</Data></Cell>
+
+        <Cell ss:StyleID="Header"><Data ss:Type="String">OptionOrder</Data></Cell>
+        <Cell ss:StyleID="Header"><Data ss:Type="String">OptionLabel</Data></Cell>
+        <Cell ss:StyleID="Header"><Data ss:Type="String">IsCorrect</Data></Cell>
+        <Cell ss:StyleID="Header"><Data ss:Type="String">Score</Data></Cell>
+        <Cell ss:StyleID="Header"><Data ss:Type="String">Wa</Data></Cell>
+      </Row>
+
+      <Row>
+        <Cell ss:StyleID="Hint"><Data ss:Type="String">1..N</Data></Cell>
+        <Cell ss:StyleID="Hint"><Data ss:Type="String">Required on first row of section</Data></Cell>
+
+        <Cell ss:StyleID="Hint"><Data ss:Type="String">1..N</Data></Cell>
+        <Cell ss:StyleID="Hint"><Data ss:Type="String">Text | Textarea | SingleChoice | MultiChoice | Likert | Radio | Checkbox | Dropdown</Data></Cell>
+        <Cell ss:StyleID="Hint"><Data ss:Type="String">TRUE/FALSE</Data></Cell>
+        <Cell ss:StyleID="Hint"><Data ss:Type="String">Required</Data></Cell>
+
+        <Cell ss:StyleID="Hint"><Data ss:Type="String">Required for Likert</Data></Cell>
+        <Cell ss:StyleID="Hint"><Data ss:Type="String">Required for Likert (decimal)</Data></Cell>
+
+        <Cell ss:StyleID="Hint"><Data ss:Type="String">Required for option-based types</Data></Cell>
+        <Cell ss:StyleID="Hint"><Data ss:Type="String">Required for option-based types</Data></Cell>
+        <Cell ss:StyleID="Hint"><Data ss:Type="String">Quiz only (TRUE/FALSE)</Data></Cell>
+        <Cell ss:StyleID="Hint"><Data ss:Type="String">Quiz scoring (decimal)</Data></Cell>
+        <Cell ss:StyleID="Hint"><Data ss:Type="String">Likert scoring (decimal)</Data></Cell>
+      </Row>
+
+      <!-- Example content (2 sections, mix of question types). -->
+      <!-- Import scope + target template is selected in the app UI when uploading. -->
+      <Row>
+        <Cell><Data ss:Type="Number">1</Data></Cell>
+        <Cell><Data ss:Type="String">Math Skills</Data></Cell>
+
+        <Cell><Data ss:Type="Number">1</Data></Cell>
+        <Cell><Data ss:Type="String">SingleChoice</Data></Cell>
+        <Cell><Data ss:Type="String">TRUE</Data></Cell>
+        <Cell><Data ss:Type="String">What is 2+2?</Data></Cell>
+
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+
+        <Cell><Data ss:Type="Number">1</Data></Cell>
+        <Cell><Data ss:Type="String">3</Data></Cell>
+        <Cell><Data ss:Type="String">FALSE</Data></Cell>
+        <Cell><Data ss:Type="Number">0</Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+      </Row>
+
+      <Row>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+
+        <Cell><Data ss:Type="Number">2</Data></Cell>
+        <Cell><Data ss:Type="String">4</Data></Cell>
+        <Cell><Data ss:Type="String">TRUE</Data></Cell>
+        <Cell><Data ss:Type="Number">10</Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+      </Row>
+
+      <Row>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+
+        <Cell><Data ss:Type="Number">3</Data></Cell>
+        <Cell><Data ss:Type="String">5</Data></Cell>
+        <Cell><Data ss:Type="String">FALSE</Data></Cell>
+        <Cell><Data ss:Type="Number">0</Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+      </Row>
+
+      <Row>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+
+        <Cell><Data ss:Type="Number">2</Data></Cell>
+        <Cell><Data ss:Type="String">Text</Data></Cell>
+        <Cell><Data ss:Type="String">FALSE</Data></Cell>
+        <Cell><Data ss:Type="String">Explain how you solved the problem.</Data></Cell>
+
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+      </Row>
+
+      <Row>
+        <Cell><Data ss:Type="Number">2</Data></Cell>
+        <Cell><Data ss:Type="String">Logic</Data></Cell>
+
+        <Cell><Data ss:Type="Number">1</Data></Cell>
+        <Cell><Data ss:Type="String">MultiChoice</Data></Cell>
+        <Cell><Data ss:Type="String">TRUE</Data></Cell>
+        <Cell><Data ss:Type="String">Select all prime numbers.</Data></Cell>
+
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+
+        <Cell><Data ss:Type="Number">1</Data></Cell>
+        <Cell><Data ss:Type="String">2</Data></Cell>
+        <Cell><Data ss:Type="String">TRUE</Data></Cell>
+        <Cell><Data ss:Type="Number">5</Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+      </Row>
+
+      <Row>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+
+        <Cell><Data ss:Type="Number">2</Data></Cell>
+        <Cell><Data ss:Type="String">4</Data></Cell>
+        <Cell><Data ss:Type="String">FALSE</Data></Cell>
+        <Cell><Data ss:Type="Number">0</Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+      </Row>
+
+      <Row>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+
+        <Cell><Data ss:Type="Number">3</Data></Cell>
+        <Cell><Data ss:Type="String">5</Data></Cell>
+        <Cell><Data ss:Type="String">TRUE</Data></Cell>
+        <Cell><Data ss:Type="Number">5</Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+      </Row>
+
+      <Row>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+
+        <Cell><Data ss:Type="Number">2</Data></Cell>
+        <Cell><Data ss:Type="String">Textarea</Data></Cell>
+        <Cell><Data ss:Type="String">TRUE</Data></Cell>
+        <Cell><Data ss:Type="String">Any comments?</Data></Cell>
+
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+        <Cell><Data ss:Type="String"></Data></Cell>
+      </Row>
+
+      <!-- Personality / Likert example intentionally omitted from the Import sheet -->
+      <!-- Rationale: one import file should contain ONE template; mixing example templates causes validation errors. -->
+      <!-- See the Instructions sheet for Likert requirements (TraitKey + Ws on the question, Wa on options). -->
+    </Table>
+    <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+      <FreezePanes/>
+      <FrozenNoSplit/>
+      <SplitHorizontal>2</SplitHorizontal>
+      <TopRowBottomPane>2</TopRowBottomPane>
+      <ActivePane>2</ActivePane>
+      <Panes>
+        <Pane>
+          <Number>2</Number>
+        </Pane>
+      </Panes>
+      <ProtectObjects>False</ProtectObjects>
+      <ProtectScenarios>False</ProtectScenarios>
+    </WorksheetOptions>
+  </Worksheet>
+
+  <Worksheet ss:Name="Instructions">
+    <Table ss:DefaultColumnWidth="150" ss:DefaultRowHeight="18">
+      <Row ss:AutoFitHeight="0" ss:Height="26">
+        <Cell ss:StyleID="Header"><Data ss:Type="String">Topic</Data></Cell>
+        <Cell ss:StyleID="Header"><Data ss:Type="String">Details</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">Scopes</Data></Cell>
+        <Cell><Data ss:Type="String">CreateTemplate (new) | AppendToTemplate (add/update within existing template) | AppendToSection (add/update questions/options inside a specific section order)</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">One template per file</Data></Cell>
+        <Cell><Data ss:Type="String">This import supports ONE template per uploaded file. Choose scope + target template in the app UI and keep the content rows in this file for that one template only.</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">TemplateType</Data></Cell>
+        <Cell ss:StyleID="Mono"><Data ss:Type="String">Quiz | Personality | Form</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">QuestionType</Data></Cell>
+        <Cell ss:StyleID="Mono"><Data ss:Type="String">Text | Textarea | SingleChoice | MultiChoice | Likert | Radio | Checkbox | Dropdown</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">Quiz scoring</Data></Cell>
+        <Cell><Data ss:Type="String">Set option Score. For MultiChoice, IsCorrect should be TRUE on correct options (used for max-score calculation).</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">Likert scoring</Data></Cell>
+        <Cell><Data ss:Type="String">Likert requires TraitKey + Ws on the question, and Wa on options. Candidate personality score is derived from WaSum grouped by TraitKey.</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">IDs / Names</Data></Cell>
+        <Cell><Data ss:Type="String">Do NOT add Name/Version columns. The backend generates stable names and manages versioning. Orders identify sections/questions/options for import matching.</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">Filling repeated columns</Data></Cell>
+        <Cell><Data ss:Type="String">Import context (Scope / Template selection / Version / TargetSectionOrder) is chosen in the app UI, not in this sheet. In the Import sheet, you can fill SectionTitle only on the first row of each section. For option-based questions, you can leave section/question fields blank on option rows after the first option (the backend carries forward values).</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">Time limit</Data></Cell>
+        <Cell><Data ss:Type="String">TimeLimitSeconds is not used at the moment, so it has been removed from this template.</Data></Cell>
+      </Row>
+    </Table>
+  </Worksheet>
+</Workbook>
+

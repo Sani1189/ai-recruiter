@@ -1,0 +1,535 @@
+### JobPost API Tests - Minimal Implementation
+### Clean endpoints matching the current controller implementation
+
+@baseUrl = http://localhost:5140
+@contentType = application/json
+
+### ===========================================
+### BASIC CRUD OPERATIONS
+### ===========================================
+
+###
+# Test 1: Create a new JobPost (minimal)
+POST {{baseUrl}}/api/JobPost
+Content-Type: {{contentType}}
+
+{
+  "name": "SoftwareEngineer",
+  "version": 1,
+  "jobTitle": "Senior Software Engineer",
+  "jobDescription": "We are looking for a Senior Software Engineer to join our team. You will be responsible for developing high-quality software solutions, mentoring junior developers, and contributing to architectural decisions.",
+  "jobType": "FullTime",
+  "experienceLevel": "Senior",
+  "maxAmountOfCandidatesRestriction": 10,
+  "minimumRequirements": [
+    "5+ years of C# and .NET experience",
+    "Strong knowledge of ASP.NET Core",
+    "Experience with Entity Framework",
+    "Knowledge of SQL Server",
+    "Experience with Git version control",
+    "Strong problem-solving skills"
+  ],
+  "policeReportRequired": false
+}
+
+###
+# Test 2: Create another JobPost
+POST {{baseUrl}}/api/JobPost
+Content-Type: {{contentType}}
+
+{
+  "name": "DataScientist",
+  "version": 1,
+  "jobTitle": "Data Scientist",
+  "jobDescription": "We are seeking a Data Scientist to analyze complex data and build machine learning models. You will work with large datasets, create predictive models, and provide insights to drive business decisions.",
+  "jobType": "FullTime",
+  "experienceLevel": "Mid",
+  "maxAmountOfCandidatesRestriction": 5,
+  "minimumRequirements": [
+    "3+ years of Python experience",
+    "Strong knowledge of machine learning",
+    "Experience with pandas, numpy, scikit-learn",
+    "Knowledge of SQL and databases",
+    "Experience with data visualization"
+  ],
+  "policeReportRequired": true
+}
+
+###
+# Test 3: Create a Part-Time JobPost
+POST {{baseUrl}}/api/JobPost
+Content-Type: {{contentType}}
+
+{
+  "name": "InternDeveloper",
+  "version": 1,
+  "jobTitle": "Junior Developer Intern",
+  "jobDescription": "Great opportunity for a junior developer to gain real-world experience. You will work on small projects, learn from senior developers, and contribute to our development team.",
+  "jobType": "PartTime",
+  "experienceLevel": "Entry",
+  "maxAmountOfCandidatesRestriction": 3,
+  "minimumRequirements": [
+    "Basic knowledge of programming",
+    "Eagerness to learn",
+    "Good communication skills"
+  ],
+  "policeReportRequired": false
+}
+
+### ===========================================
+### JOBPOST WITH STEPS OPERATIONS
+### ===========================================
+
+###
+# Test 4: Create JobPost with NEW steps
+POST {{baseUrl}}/api/JobPost
+Content-Type: {{contentType}}
+
+{
+  "name": "FullStackDeveloper",
+  "version": 1,
+  "jobTitle": "Full Stack Developer",
+  "jobDescription": "We are looking for a Full Stack Developer who can work on both frontend and backend technologies. You will be responsible for developing end-to-end solutions.",
+  "jobType": "FullTime",
+  "experienceLevel": "Mid",
+  "maxAmountOfCandidatesRestriction": 8,
+  "minimumRequirements": [
+    "3+ years of full-stack development experience",
+    "Strong knowledge of React and Node.js",
+    "Experience with databases (SQL and NoSQL)",
+    "Knowledge of cloud platforms (AWS/Azure)",
+    "Experience with CI/CD pipelines"
+  ],
+  "policeReportRequired": false,
+  "steps": [
+    {
+      "stepNumber": 1,
+      "newStep": {
+        "name": "FullStackScreening",
+        "version": 1,
+        "stepNumber": 1,
+        "isInterview": false,
+        "stepType": "Screening",
+        "recruiterCompletesStepManually": true,
+        "interviewConfigurationName": null,
+        "interviewConfigurationVersion": null
+      }
+    },
+    {
+      "stepNumber": 2,
+      "newStep": {
+        "name": "FullStackTechInterview",
+        "version": 1,
+        "stepNumber": 2,
+        "isInterview": true,
+        "stepType": "Technical",
+        "recruiterCompletesStepManually": false,
+        "interviewConfigurationName": "FullStackConfig",
+        "interviewConfigurationVersion": 1
+      }
+    },
+    {
+      "stepNumber": 3,
+      "newStep": {
+        "name": "FullStackCodingChallenge",
+        "version": 1,
+        "stepNumber": 3,
+        "isInterview": false,
+        "stepType": "Assignment",
+        "recruiterCompletesStepManually": false,
+        "interviewConfigurationName": null,
+        "interviewConfigurationVersion": null
+      }
+    }
+  ]
+}
+
+###
+# Test 5: Create JobPost with EXISTING steps (prerequisites: create steps first)
+# First, create some step templates
+POST {{baseUrl}}/api/JobPostStep
+Content-Type: {{contentType}}
+
+{
+  "name": "StandardScreening",
+  "version": 1,
+  "stepNumber": 1,
+  "isInterview": false,
+  "stepType": "Screening",
+  "recruiterCompletesStepManually": true,
+  "interviewConfigurationName": null,
+  "interviewConfigurationVersion": null
+}
+
+###
+POST {{baseUrl}}/api/JobPostStep
+Content-Type: {{contentType}}
+
+{
+  "name": "StandardTechInterview",
+  "version": 1,
+  "stepNumber": 2,
+  "isInterview": true,
+  "stepType": "Technical",
+  "recruiterCompletesStepManually": false,
+  "interviewConfigurationName": "StandardTechConfig",
+  "interviewConfigurationVersion": 1
+}
+
+###
+# Now create JobPost using existing steps
+POST {{baseUrl}}/api/JobPost
+Content-Type: {{contentType}}
+
+{
+  "name": "BackendDeveloper",
+  "version": 1,
+  "jobTitle": "Backend Developer",
+  "jobDescription": "We are seeking a Backend Developer to build scalable server-side applications. You will work with microservices, APIs, and cloud infrastructure.",
+  "jobType": "FullTime",
+  "experienceLevel": "Senior",
+  "maxAmountOfCandidatesRestriction": 6,
+  "minimumRequirements": [
+    "5+ years of backend development experience",
+    "Strong knowledge of C# and .NET Core",
+    "Experience with microservices architecture",
+    "Knowledge of Docker and Kubernetes",
+    "Experience with message queues (RabbitMQ/Apache Kafka)"
+  ],
+  "policeReportRequired": true,
+  "steps": [
+    {
+      "stepNumber": 1,
+      "existingStepName": "StandardScreening",
+      "existingStepVersion": 1
+    },
+    {
+      "stepNumber": 2,
+      "existingStepName": "StandardTechInterview",
+      "existingStepVersion": 1
+    }
+  ]
+}
+
+###
+# Test 6: Create JobPost with MIXED steps (existing + new)
+POST {{baseUrl}}/api/JobPost
+Content-Type: {{contentType}}
+
+{
+  "name": "DevOpsEngineer",
+  "version": 1,
+  "jobTitle": "DevOps Engineer",
+  "jobDescription": "We are looking for a DevOps Engineer to manage our infrastructure and deployment pipelines. You will work with cloud platforms, containerization, and automation tools.",
+  "jobType": "FullTime",
+  "experienceLevel": "Mid",
+  "maxAmountOfCandidatesRestriction": 4,
+  "minimumRequirements": [
+    "3+ years of DevOps experience",
+    "Strong knowledge of AWS/Azure",
+    "Experience with Docker and Kubernetes",
+    "Knowledge of Infrastructure as Code (Terraform/CloudFormation)",
+    "Experience with CI/CD pipelines"
+  ],
+  "policeReportRequired": false,
+  "steps": [
+    {
+      "stepNumber": 1,
+      "existingStepName": "StandardScreening",
+      "existingStepVersion": 1
+    },
+    {
+      "stepNumber": 2,
+      "newStep": {
+        "name": "DevOpsTechnicalInterview",
+        "version": 1,
+        "stepNumber": 2,
+        "isInterview": true,
+        "stepType": "Technical",
+        "recruiterCompletesStepManually": false,
+        "interviewConfigurationName": "DevOpsConfig",
+        "interviewConfigurationVersion": 1
+      }
+    },
+    {
+      "stepNumber": 3,
+      "newStep": {
+        "name": "InfrastructureChallenge",
+        "version": 1,
+        "stepNumber": 3,
+        "isInterview": false,
+        "stepType": "Assignment",
+        "recruiterCompletesStepManually": false,
+        "interviewConfigurationName": null,
+        "interviewConfigurationVersion": null
+      }
+    }
+  ]
+}
+
+###
+# Test 7: Get all JobPosts
+GET {{baseUrl}}/api/JobPost
+
+###
+# Test 8: Get specific JobPost by name and version
+GET {{baseUrl}}/api/JobPost/DevOpsEngineer/1
+
+###
+# Test 9: Get JobPost with steps (using orchestrator)
+GET {{baseUrl}}/api/JobPost/FullStackDeveloper/1
+
+###
+# Test 10: Get latest version of JobPost
+GET {{baseUrl}}/api/JobPost/SoftwareEngineer/latest
+
+###
+# Test 11: Get edit history by name
+GET {{baseUrl}}/api/JobPost/SoftwareEngineer/history
+
+###
+# Test 12: Update JobPost (creates new version)
+PUT {{baseUrl}}/api/JobPost/SoftwareEngineer/1
+Content-Type: {{contentType}}
+
+{
+  "name": "SoftwareEngineer",
+  "version": 1,
+  "jobTitle": "Senior Software Engineer (Updated)",
+  "jobDescription": "Updated job description: We are looking for a Senior Software Engineer to join our team. You will be responsible for developing high-quality software solutions, mentoring junior developers, and contributing to architectural decisions. Additional responsibilities include code reviews and technical leadership.",
+  "jobType": "FullTime",
+  "experienceLevel": "Senior",
+  "maxAmountOfCandidatesRestriction": 15,
+  "minimumRequirements": [
+    "5+ years of C# and .NET experience",
+    "Strong knowledge of ASP.NET Core",
+    "Experience with Entity Framework",
+    "Knowledge of SQL Server",
+    "Experience with Git version control",
+    "Strong problem-solving skills",
+    "Experience with microservices architecture"
+  ],
+  "policeReportRequired": true
+}
+
+### ===========================================
+### JOB POST ENDPOINTS (Following Prompt/Interview Pattern)
+### ===========================================
+
+###
+# Test 13: Get all job posts (simple list - supports filtering but no pagination)
+GET {{baseUrl}}/api/JobPost
+
+###
+# Test 14: Get all job posts WITH steps (simple list - supports filtering but no pagination)
+GET {{baseUrl}}/api/JobPost?includeSteps=true
+
+###
+# Test 15: Search job posts with filters (no pagination)
+GET {{baseUrl}}/api/JobPost?ExperienceLevel=Mid&JobType=FullTime
+
+###
+# Test 16: Search job posts with filters AND steps (no pagination)
+GET {{baseUrl}}/api/JobPost?ExperienceLevel=Mid&JobType=FullTime&includeSteps=true
+
+###
+# Test 17: Search job posts with text filter (no pagination)
+GET {{baseUrl}}/api/JobPost?SearchTerm=Engineer&SortBy=JobTitle&SortDescending=false
+
+###
+# Test 18: Search job posts with text filter AND steps (no pagination)
+GET {{baseUrl}}/api/JobPost?SearchTerm=Engineer&SortBy=JobTitle&SortDescending=false&includeSteps=true
+
+###
+# Test 19: Get filtered job posts with pagination (basic - no steps)
+GET {{baseUrl}}/api/JobPost/filtered?Page=1&PageSize=5
+
+###
+# Test 20: Get filtered job posts with pagination AND steps
+GET {{baseUrl}}/api/JobPost/filtered?Page=1&PageSize=5&includeSteps=true
+
+###
+# Test 21: Get filtered job posts with steps (complete data) - dedicated endpoint
+GET {{baseUrl}}/api/JobPost/filtered/with-steps?Page=1&PageSize=5
+
+###
+# Test 22: Search with filters and pagination (basic)
+GET {{baseUrl}}/api/JobPost/filtered?ExperienceLevel=Mid&JobType=FullTime&Page=1&PageSize=3
+
+###
+# Test 23: Search with filters and pagination AND steps
+GET {{baseUrl}}/api/JobPost/filtered?ExperienceLevel=Mid&JobType=FullTime&Page=1&PageSize=3&includeSteps=true
+
+###
+# Test 24: Search with filters and pagination (with steps) - dedicated endpoint
+GET {{baseUrl}}/api/JobPost/filtered/with-steps?ExperienceLevel=Senior&Page=1&PageSize=2
+
+###
+# Test 25: Search with text filter and pagination
+GET {{baseUrl}}/api/JobPost/filtered/with-steps?SearchTerm=Engineer&SortBy=JobTitle&SortDescending=false&Page=1&PageSize=3
+
+###
+# Test 26: Search by Experience Level (paginated)
+GET {{baseUrl}}/api/JobPost/search/experience/Senior?page=1&pageSize=2
+
+###
+# Test 27: Search by Job Type (paginated)
+GET {{baseUrl}}/api/JobPost/search/type/FullTime?page=1&pageSize=3
+
+### ===========================================
+### JOB POST STEP ENDPOINTS (Following Same Pattern)
+### ===========================================
+
+###
+# Test 23: Get all job post steps (simple list - supports filtering but no pagination)
+GET {{baseUrl}}/api/JobPostStep
+
+###
+# Test 24: Search steps by step type (no pagination)
+GET {{baseUrl}}/api/JobPostStep?StepType=Technical
+
+###
+# Test 25: Search steps with text filter (no pagination)
+GET {{baseUrl}}/api/JobPostStep?SearchTerm=Interview&SortBy=Name&SortDescending=false
+
+###
+# Test 26: Get filtered job post steps with pagination
+GET {{baseUrl}}/api/JobPostStep/filtered?Page=1&PageSize=5
+
+###
+# Test 27: Search steps by step type with pagination
+GET {{baseUrl}}/api/JobPostStep/filtered?StepType=Technical&Page=1&PageSize=3
+
+###
+# Test 28: Search steps with text filter and pagination
+GET {{baseUrl}}/api/JobPostStep/filtered?SearchTerm=Interview&SortBy=Name&SortDescending=false&Page=1&PageSize=3
+
+###
+# Test 29: Get dropdown list for selecting existing steps
+GET {{baseUrl}}/api/JobPostStep/dropdown
+
+### ===========================================
+### JOB POST STEP ASSIGNMENT ENDPOINTS
+### ===========================================
+
+###
+# Test 30: Get step assignments for a job post
+GET {{baseUrl}}/api/JobPostStepAssignment/jobpost/SoftwareEngineer/1
+
+###
+# Test 31: Assign a single step to job post (RESTful endpoint)
+POST {{baseUrl}}/api/JobPostStepAssignment/SoftwareEngineer/1
+Content-Type: {{contentType}}
+
+{
+  "stepNumber": 1,
+  "status": "pending",
+  "stepDetails": {
+    "name": "TechnicalScreening",
+    "version": 1,
+    "isInterview": false,
+    "stepType": "Screening",
+    "recruiterCompletesStepManually": true,
+    "interviewConfigurationName": null,
+    "interviewConfigurationVersion": null
+  }
+}
+
+###
+# Test 32: Assign multiple steps to job post (bulk assignment)
+POST {{baseUrl}}/api/JobPostStepAssignment/SoftwareEngineer/1/bulk
+Content-Type: {{contentType}}
+
+[
+  {
+    "stepNumber": 1,
+    "status": "pending",
+    "stepDetails": {
+      "name": "InitialScreening",
+      "version": 1,
+      "isInterview": false,
+      "stepType": "Screening",
+      "recruiterCompletesStepManually": true,
+      "interviewConfigurationName": null,
+      "interviewConfigurationVersion": null
+    }
+  },
+  {
+    "stepNumber": 2,
+    "status": "pending",
+    "stepDetails": {
+      "name": "TechnicalInterview",
+      "version": 1,
+      "isInterview": true,
+      "stepType": "Technical",
+      "recruiterCompletesStepManually": false,
+      "interviewConfigurationName": "TechConfig",
+      "interviewConfigurationVersion": 1
+    }
+  }
+]
+
+###
+# Test 33: Update assignment status
+PUT {{baseUrl}}/api/JobPostStepAssignment/SoftwareEngineer/1/TechnicalScreening/1/status
+Content-Type: {{contentType}}
+
+"in_progress"
+
+###
+# Test 34: Remove step assignment
+DELETE {{baseUrl}}/api/JobPostStepAssignment/SoftwareEngineer/1/TechnicalScreening/1
+
+### ===========================================
+### ERROR TESTING
+### ===========================================
+
+###
+# Test 17: Get non-existent JobPost
+GET {{baseUrl}}/api/JobPost/NonExistent/1
+
+###
+# Test 18: Create JobPost with invalid data
+POST {{baseUrl}}/api/JobPost
+Content-Type: {{contentType}}
+
+{
+  "name": "",
+  "version": 0,
+  "jobTitle": "",
+  "jobDescription": "",
+  "jobType": "InvalidType",
+  "experienceLevel": "InvalidLevel",
+  "maxAmountOfCandidatesRestriction": 0,
+  "minimumRequirements": [],
+  "policeReportRequired": false
+}
+
+###
+# Test 19: Update non-existent JobPost
+PUT {{baseUrl}}/api/JobPost/NonExistent/1
+Content-Type: {{contentType}}
+
+{
+  "name": "NonExistent",
+  "version": 1,
+  "jobTitle": "Test Job",
+  "jobDescription": "Test Description",
+  "jobType": "FullTime",
+  "experienceLevel": "Mid",
+  "maxAmountOfCandidatesRestriction": 5,
+  "minimumRequirements": ["Test requirement"],
+  "policeReportRequired": false
+}
+
+### ===========================================
+### CLEANUP (Optional)
+### ===========================================
+
+###
+# Test 20: Delete specific JobPost version
+DELETE {{baseUrl}}/api/JobPost/DataScientist/1
+
+###
+# Test 21: Delete another JobPost version
+DELETE {{baseUrl}}/api/JobPost/InternDeveloper/1

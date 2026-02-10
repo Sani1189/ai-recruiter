@@ -1,0 +1,163 @@
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Sas;
+using Microsoft.Extensions.Logging;
+using Recruiter.Application.Common.Interfaces;
+using Recruiter.Application.Common.Options;
+
+namespace Recruiter.Infrastructure.Services;
+
+public class AzureBlobStorageService : IFileStorageService
+{
+    private readonly ILogger _logger;
+    private readonly BlobServiceClient _blobServiceClient;
+    private readonly AzureStorageOptions _options;
+
+    public AzureBlobStorageService(
+        ILoggerFactory loggerFactory, 
+        BlobServiceClient blobServiceClient,
+        AzureStorageOptions options)
+    {
+        _logger = loggerFactory.CreateLogger<AzureBlobStorageService>();
+        _blobServiceClient = blobServiceClient;
+        _options = options;
+    }
+
+    public string GetContainerName() => _options.ContainerName;
+
+    public string GetStorageAccountName()
+    {
+        if (!string.IsNullOrWhiteSpace(_blobServiceClient.AccountName))
+            return _blobServiceClient.AccountName;
+
+        if (!string.IsNullOrWhiteSpace(_options.StorageAccountName))
+            return _options.StorageAccountName;
+
+        if (!string.IsNullOrWhiteSpace(_options.ConnectionString))
+        {
+            var parts = _options.ConnectionString.Split(';');
+            foreach (var part in parts)
+            {
+                if (part.StartsWith("AccountName=", StringComparison.OrdinalIgnoreCase))
+                    return part.Substring("AccountName=".Length).Trim();
+            }
+        }
+
+        return string.Empty;
+    }
+
+    public BlobClient GetBlobClient(string containerName, string blobPath)
+        => _blobServiceClient.GetBlobContainerClient(containerName).GetBlobClient(blobPath);
+
+    public BlobContainerClient GetBlobContainerClient(string containerName)
+        => _blobServiceClient.GetBlobContainerClient(containerName);
+
+    public async Task<string> UploadAsync(string containerName, string blobPath, Stream fileStream, string contentType)
+    {
+        try
+        {
+            var client = GetBlobClient(containerName, blobPath);
+            var uploadOptions = new BlobUploadOptions
+            {
+                HttpHeaders = new BlobHttpHeaders { ContentType = contentType }
+            };
+            await client.UploadAsync(fileStream, uploadOptions);
+            return client.Uri.ToString();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error uploading blob '{blobPath}' to container '{containerName}'!", blobPath, containerName);
+            throw;
+        }
+    }
+
+    public async Task<Stream> DownloadAsync(string containerName, string blobPath)
+    {
+        try
+        {
+            var client = GetBlobClient(containerName, blobPath);
+            var response = await client.DownloadStreamingAsync();
+            if (response.Value.Content.CanSeek && response.Value.Content.Position > 0)
+                response.Value.Content.Position = 0;
+            return response.Value.Content;
+        }
+        catch (Azure.RequestFailedException ex) when (ex.Status == 403)
+        {
+            _logger.LogError(ex, "Access denied to blob '{blobPath}' in container '{containerName}'", blobPath, containerName);
+            throw new UnauthorizedAccessException("Access denied. Check Azure Storage permissions.", ex);
+        }
+        catch (Azure.RequestFailedException ex) when (ex.Status == 404)
+        {
+            _logger.LogWarning("Blob '{blobPath}' not found in container '{containerName}'", blobPath, containerName);
+            throw new FileNotFoundException($"Blob not found in container '{containerName}'", ex);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error downloading blob '{blobPath}' from container '{containerName}'", blobPath, containerName);
+            throw;
+        }
+    }
+
+    public async Task DeleteAsync(string containerName, string blobPath)
+    {
+        try
+        {
+            var client = GetBlobClient(containerName, blobPath);
+            await client.DeleteIfExistsAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error deleting blob '{blobPath}' in container '{containerName}'!", blobPath, containerName);
+            throw;
+        }
+    }
+
+    public async Task<bool> ExistsAsync(string containerName, string blobPath)
+    {
+        try
+        {
+            var client = GetBlobClient(containerName, blobPath);
+            return await client.ExistsAsync();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error checking for existence of blob '{blobPath}' in container '{containerName}'!", blobPath, containerName);
+            throw;
+        }
+    }
+
+    public async Task<IDictionary<string, string>?> GetMetadataAsync(string containerName, string blobPath)
+    {
+        try
+        {
+            var client = GetBlobClient(containerName, blobPath);
+            var properties = await client.GetPropertiesAsync();
+            return properties?.Value?.Metadata;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error get metadata for blob '{blobPath}' in container '{containerName}'!", blobPath, containerName);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Generates a secure upload URL for direct client-to-Azure uploads
+    /// </summary>
+    public string GenerateUploadSasUrl(string containerName, string blobPath, int expirationMinutes = 20)
+    {
+        var client = GetBlobClient(containerName, blobPath);
+        var uri = client.GenerateSasUri(BlobSasPermissions.Write, DateTimeOffset.UtcNow.AddMinutes(expirationMinutes));
+        return uri.ToString();
+    }
+
+    /// <summary>
+    /// Generates a secure, short-lived download URL (read-once style with very short expiration)
+    /// </summary>
+    public string GenerateSecureDownloadUrl(string containerName, string blobPath, int expirationMinutes = 5)
+    {
+        var client = GetBlobClient(containerName, blobPath);
+        var uri = client.GenerateSasUri(BlobSasPermissions.Read, DateTimeOffset.UtcNow.AddMinutes(expirationMinutes));
+        return uri.ToString();
+    }
+}

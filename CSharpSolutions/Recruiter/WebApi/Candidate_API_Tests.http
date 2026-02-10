@@ -1,0 +1,179 @@
+### Candidate API Tests
+### Base URL - Update this to match your running application
+@baseUrl = http://localhost:5140
+@contentType = application/json
+
+### Variables
+@candidateId = 00000000-0000-0000-0000-000000000001
+@userId = 00000000-0000-0000-0000-000000000002
+@cvFileId = 00000000-0000-0000-0000-000000000003
+
+### ===========================================
+### GET Operations
+### ===========================================
+
+### Get all candidates
+GET {{baseUrl}}/api/candidates
+Accept: {{contentType}}
+
+### Get candidate by ID
+GET {{baseUrl}}/api/candidates/{{candidateId}}
+Accept: {{contentType}}
+
+### Get candidate by user ID
+GET {{baseUrl}}/api/candidates/by-user/{{userId}}
+Accept: {{contentType}}
+
+### Get candidate by CV file ID
+GET {{baseUrl}}/api/candidates/by-cv-file/{{cvFileId}}
+Accept: {{contentType}}
+
+### Get candidates with pagination
+GET {{baseUrl}}/api/candidates?pageNumber=1&pageSize=10
+Accept: {{contentType}}
+
+### Get candidates with search term
+GET {{baseUrl}}/api/candidates?searchTerm=user
+Accept: {{contentType}}
+
+### Get candidates by user ID filter
+GET {{baseUrl}}/api/candidates?userId={{userId}}
+Accept: {{contentType}}
+
+### Get candidates by CV file ID filter
+GET {{baseUrl}}/api/candidates?cvFileId={{cvFileId}}
+Accept: {{contentType}}
+
+### ===========================================
+### POST Operations
+### ===========================================
+
+### Create new candidate
+POST {{baseUrl}}/api/candidates
+Content-Type: {{contentType}}
+
+{
+  "cvFileId": "{{cvFileId}}",
+  "userId": "{{userId}}"
+}
+
+### Create candidate with different user and CV file
+POST {{baseUrl}}/api/candidates
+Content-Type: {{contentType}}
+
+{
+  "cvFileId": "00000000-0000-0000-0000-000000000004",
+  "userId": "00000000-0000-0000-0000-000000000005"
+}
+
+### Create another candidate
+POST {{baseUrl}}/api/candidates
+Content-Type: {{contentType}}
+
+{
+  "cvFileId": "00000000-0000-0000-0000-000000000006",
+  "userId": "00000000-0000-0000-0000-000000000007"
+}
+
+### ===========================================
+### PUT Operations
+### ===========================================
+
+### Update candidate
+PUT {{baseUrl}}/api/candidates/{{candidateId}}
+Content-Type: {{contentType}}
+
+{
+  "id": "{{candidateId}}",
+  "cvFileId": "00000000-0000-0000-0000-000000000008",
+  "userId": "{{userId}}",
+  "createdAt": "2024-01-01T09:00:00Z",
+  "updatedAt": "2024-12-20T15:30:00Z"
+}
+
+### Update candidate with different CV file
+PUT {{baseUrl}}/api/candidates/{{candidateId}}
+Content-Type: {{contentType}}
+
+{
+  "id": "{{candidateId}}",
+  "cvFileId": "{{cvFileId}}",
+  "userId": "00000000-0000-0000-0000-000000000009",
+  "createdAt": "2024-01-01T09:00:00Z",
+  "updatedAt": "2024-12-20T15:45:00Z"
+}
+
+### ===========================================
+### DELETE Operations
+### ===========================================
+
+### Delete candidate
+DELETE {{baseUrl}}/api/candidates/{{candidateId}}
+Accept: {{contentType}}
+
+### ===========================================
+### Advanced Operations
+### ===========================================
+
+### Get candidate with job applications
+GET {{baseUrl}}/api/candidates/{{candidateId}}/job-applications
+Accept: {{contentType}}
+
+### Get candidate statistics
+GET {{baseUrl}}/api/candidates/{{candidateId}}/statistics
+Accept: {{contentType}}
+
+### Bulk create candidates
+POST {{baseUrl}}/api/candidates/bulk
+Content-Type: {{contentType}}
+
+[
+  {
+    "cvFileId": "00000000-0000-0000-0000-000000000010",
+    "userId": "00000000-0000-0000-0000-000000000011"
+  },
+  {
+    "cvFileId": "00000000-0000-0000-0000-000000000012",
+    "userId": "00000000-0000-0000-0000-000000000013"
+  }
+]
+
+### ===========================================
+### Error Testing
+### ===========================================
+
+### Test with invalid candidate ID
+GET {{baseUrl}}/api/candidates/invalid-id
+Accept: {{contentType}}
+
+### Test creating candidate with invalid CV file ID
+POST {{baseUrl}}/api/candidates
+Content-Type: {{contentType}}
+
+{
+  "cvFileId": "invalid-guid",
+  "userId": "{{userId}}"
+}
+
+### Test creating candidate with missing required fields
+POST {{baseUrl}}/api/candidates
+Content-Type: {{contentType}}
+
+{
+  "cvFileId": "00000000-0000-0000-0000-000000000000"
+}
+
+### Test updating non-existent candidate
+PUT {{baseUrl}}/api/candidates/00000000-0000-0000-0000-000000000999
+Content-Type: {{contentType}}
+
+{
+  "id": "00000000-0000-0000-0000-000000000999",
+  "cvFileId": "{{cvFileId}}",
+  "userId": "{{userId}}"
+}
+
+### Test deleting non-existent candidate
+DELETE {{baseUrl}}/api/candidates/00000000-0000-0000-0000-000000000999
+Accept: {{contentType}}
+

@@ -1,0 +1,210 @@
+### JobPostStep API Tests - Minimal Implementation
+### Clean endpoints matching the current controller implementation
+
+@baseUrl = http://localhost:5140
+@contentType = application/json
+
+### ===========================================
+### BASIC CRUD OPERATIONS
+### ===========================================
+
+###
+# Test 1: Create a new JobPostStep (Screening)
+POST {{baseUrl}}/api/JobPostStep
+Content-Type: {{contentType}}
+
+{
+  "name": "InitialScreening",
+  "version": 1,
+  "stepNumber": 1,
+  "isInterview": false,
+  "stepType": "Screening",
+  "recruiterCompletesStepManually": true,
+  "interviewConfigurationName": null,
+  "interviewConfigurationVersion": null
+}
+
+###
+# Test 2: Create a Technical Interview Step
+POST {{baseUrl}}/api/JobPostStep
+Content-Type: {{contentType}}
+
+{
+  "name": "TechnicalInterview",
+  "version": 1,
+  "stepNumber": 2,
+  "isInterview": true,
+  "stepType": "Technical",
+  "recruiterCompletesStepManually": false,
+  "interviewConfigurationName": "TechInterviewConfig",
+  "interviewConfigurationVersion": 1
+}
+
+###
+# Test 3: Create a Behavioral Interview Step
+POST {{baseUrl}}/api/JobPostStep
+Content-Type: {{contentType}}
+
+{
+  "name": "BehavioralInterview",
+  "version": 1,
+  "stepNumber": 3,
+  "isInterview": true,
+  "stepType": "Behavioral",
+  "recruiterCompletesStepManually": false,
+  "interviewConfigurationName": "BehavioralConfig",
+  "interviewConfigurationVersion": 1
+}
+
+###
+# Test 4: Create an Assignment Step
+POST {{baseUrl}}/api/JobPostStep
+Content-Type: {{contentType}}
+
+{
+  "name": "CodingAssignment",
+  "version": 1,
+  "stepNumber": 4,
+  "isInterview": false,
+  "stepType": "Assignment",
+  "recruiterCompletesStepManually": false,
+  "interviewConfigurationName": null,
+  "interviewConfigurationVersion": null
+}
+
+###
+# Test 5: Create a Final Interview Step
+POST {{baseUrl}}/api/JobPostStep
+Content-Type: {{contentType}}
+
+{
+  "name": "FinalInterview",
+  "version": 1,
+  "stepNumber": 5,
+  "isInterview": true,
+  "stepType": "Interview",
+  "recruiterCompletesStepManually": false,
+  "interviewConfigurationName": "FinalInterviewConfig",
+  "interviewConfigurationVersion": 1
+}
+
+###
+# Test 6: Get all JobPostSteps
+GET {{baseUrl}}/api/JobPostStep
+
+ 
+###
+# Test 7: Get specific JobPostStep by name and version
+GET {{baseUrl}}/api/JobPostStep/TestStep2/1
+
+###
+# Test 8: Get latest version of JobPostStep
+GET {{baseUrl}}/api/JobPostStep/TechnicalInterview/latest
+
+###
+# Test 9: Get dropdown list for selecting existing steps
+GET {{baseUrl}}/api/JobPostStep/dropdown
+
+###
+# Test 10: Update JobPostStep (creates new version)
+PUT {{baseUrl}}/api/JobPostStep/TestStep2/1
+Content-Type: {{contentType}}
+
+{
+  "name": "TestStep2",
+  "version": 1,
+  "stepNumber": 2,
+  "isInterview": true,
+  "stepType": "Technical",
+  "recruiterCompletesStepManually": true,
+  "interviewConfigurationName": "UpdatedTechConfig dd",
+  "interviewConfigurationVersion": 2,
+  "shouldUpdateVersion": true
+}
+
+### ===========================================
+### QUERY OPERATIONS
+### ===========================================
+
+###
+# Test 11: Get JobPostSteps with query parameters
+GET {{baseUrl}}/api/JobPostStep?StepType=Technical&Page=1&PageSize=5
+
+###
+# Test 12: Get JobPostSteps by name filter
+GET {{baseUrl}}/api/JobPostStep?Name=Interview&SortBy=Name&SortDescending=false
+
+###
+# Test 13: Get all interview steps
+GET {{baseUrl}}/api/JobPostStep?StepType=Interview
+
+###
+# Test 14: Get steps with pagination
+GET {{baseUrl}}/api/JobPostStep?Page=1&PageSize=3&SortBy=StepType
+
+### ===========================================
+### ERROR TESTING
+### ===========================================
+
+###
+# Test 15: Get non-existent JobPostStep
+GET {{baseUrl}}/api/JobPostStep/NonExistent/1
+
+###
+# Test 16: Create JobPostStep with invalid data
+POST {{baseUrl}}/api/JobPostStep
+Content-Type: {{contentType}}
+
+{
+  "name": "",
+  "version": 0,
+  "stepNumber": 0,
+  "isInterview": false,
+  "stepType": "InvalidType",
+  "recruiterCompletesStepManually": false,
+  "interviewConfigurationName": null,
+  "interviewConfigurationVersion": null
+}
+
+###
+# Test 17: Update non-existent JobPostStep
+PUT {{baseUrl}}/api/JobPostStep/NonExistent/1
+Content-Type: {{contentType}}
+
+{
+  "name": "TestStep2",
+  "version": 1,
+  "stepNumber": 1,
+  "isInterview": false,
+  "stepType": "Screening",
+  "recruiterCompletesStepManually": true,
+  "interviewConfigurationName": null,
+  "interviewConfigurationVersion": null
+}
+
+###
+# Test 18: Create duplicate JobPostStep
+POST {{baseUrl}}/api/JobPostStep
+Content-Type: {{contentType}}
+
+{
+  "name": "TestStep2",
+  "version": 1,
+  "isInterview": false,
+  "stepType": "Screening",
+  "recruiterCompletesStepManually": true,
+  "interviewConfigurationName": null,
+  "interviewConfigurationVersion": null
+}
+
+### ===========================================
+### CLEANUP (Optional)
+### ===========================================
+
+###
+# Test 19: Delete specific JobPostStep version
+DELETE {{baseUrl}}/api/JobPostStep/CodingAssignment/1
+
+###
+# Test 20: Delete another JobPostStep version
+DELETE {{baseUrl}}/api/JobPostStep/BehavioralInterview/1

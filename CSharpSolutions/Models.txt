@@ -1,0 +1,317 @@
+// --- Core content & prompts ---
+Table Prompt {
+  name string [pk]
+  version number [pk]
+  category string        // e.g., "instructions" | "tonality" | "rubric" | "question_bank"
+  content string
+  locale string [null]
+  tags string[] [null]
+  createdAt timestamp
+}
+
+Table InterviewConfiguration {
+  name string [pk]
+  version number [pk]
+  modality string        // "voice" | "text" | "coding" | "assignment"
+  tone string [null]     // moved off JobPost
+  probingDepth string [null]
+  focusArea string [null]
+  duration number [null]
+  language string [null]
+  instructionPromptName string
+  personalityPromptName string
+  questionsPromptName string
+  instructionPromptVersion number
+  personalityPromptVersion number
+  questionsPromptVersion number
+  active boolean
+}
+
+// --- Job posts & steps ---
+Table JobPost {
+  name string [pk]
+  version number [pk]
+  MaxAmountOfCandidatesRestriction number
+  MinimumRequirements string[]
+  ExperienceLevel string       // "Entry" | "Mid" | "Senior"
+  JobTitle string
+  JobType string               // "Software Engineer" | "Data Scientist" | ...
+  JobDescription string
+  PoliceReportRequired boolean [null]
+}
+
+Table JobPostStep {
+  name string [pk]
+  version number [pk]  
+  isInterview bool     // "pending" | "in_progress" | "completed" | "skipped" | "failed"
+  stepType string              // "Screening" | "Technical" | "Behavioral" | "Assignment" | "Interview" | ...
+  recruiterCompletesStepManually bool
+  interviewConfigurationName string [null] 
+  interviewConfigurationVersion number [null]  
+}
+
+// --- Link between JobPost and reusable JobPostStep templates ---
+Table JobPostStepAssignment {
+  id string [pk]             // FK → JobPost.name
+  jobPostName string         // FK → JobPost.name
+  jobPostVersion number      // FK → JobPost.version
+  stepName string            // FK → JobPostStep.name
+  stepVersion number         // FK → JobPostStep.version
+  
+  stepNumber number                 // Order of step within this job post
+}
+
+// --- Applications & per-application steps ---
+Table JobApplication {
+  id string [pk]
+  jobPostName string
+  jobPostVersion number
+  candidateId string
+  completedAt timestamp [null]
+}
+
+// Contains 
+Table JobApplicationStep {
+  id string [pk]
+  jobApplicationId string
+  jobPostStepName string
+  jobPostStepVersion number
+  status string
+  startedAt timestamp [null]
+  completedAt timestamp [null]
+  stepNumber number
+  data string [null]           // JSON blob for step outputs/artifacts
+}
+
+// --- Interview now references the per-application step ---
+Table Interview {
+  id string [pk]
+  jobApplicationStepId string
+  interviewAudioUrl string [null]
+  interviewConfigurationName string
+  interviewConfigurationVersion number
+  transcriptUrl string [null]
+  interviewQuestions string[]
+  completedAt timestamp [null]
+  duration number [null]
+}
+
+// --- Scoring & feedback now tied to Interview (not JobApplication) ---
+Table Score {
+  id string [pk]
+  avg number
+  english number
+  technical number
+  communication number
+  problemSolving number
+  interviewId string
+}
+
+Table Feedback {
+  id string [pk]
+  detailed string
+  summary string
+  strengths string[]
+  weaknesses string[]
+  interviewId string
+}
+
+// --- Profiles, files, etc. (unchanged except cleaner refs) ---
+
+
+Table cv_evaluation {
+  id int [pk, increment]
+  user_profile_id string [ref: > UserProfile.id]
+  prompt_category varchar [ref: > Prompt.name]
+  prompt_version varchar [ref: > Prompt.version]
+  file_id string [ref: > File.id]
+  model_used varchar [not null]
+  response_json jsonb [not null]
+  created_at timestamp [default: `now()`]
+  Note: 'Represents a single CV parsing and evaluation event for a candidate. Keeps raw JSON data. Updated to ref UserProfile directly (for consistency with structured data tables) and uses category + version for prompt ref. file_id links to File table for blob storage location (e.g., original CV).'
+}
+
+Table experience {
+  id int [pk, increment]
+  user_profile_id string [ref: > UserProfile.id]
+  title varchar
+  organization varchar
+  industry varchar
+  location varchar
+  start_date date
+  end_date date
+  description varchar
+  Note: 'Extracted experience details from the CV. Now connected directly to UserProfile (allows manual edits without corrupting cv_evaluation raw data; re-map from raw JSON for version overwrites).'
+}
+
+Table education {
+  id int [pk, increment]
+  user_profile_id string [ref: > UserProfile.id]
+  degree varchar
+  institution varchar
+  field_of_study varchar
+  location varchar
+  start_date date
+  end_date date
+  Note: 'Extracted education details from the CV. Now connected directly to UserProfile.'
+}
+
+Table skills {
+  id int [pk, increment]
+  user_profile_id string [ref: > UserProfile.id]
+  category varchar
+  skill_name varchar
+  proficiency varchar
+  years_experience int
+  unit varchar
+  Note: 'Extracted skills from the CV. Now connected directly to UserProfile.'
+}
+
+Table projects_research {
+  id int [pk, increment]
+  user_profile_id string [ref: > UserProfile.id]
+  title varchar
+  description varchar
+  role varchar
+  technologies_used varchar
+  link varchar
+  Note: 'Extracted projects and research from the CV. Now connected directly to UserProfile.'
+}
+
+Table certifications_licenses {
+  id int [pk, increment]
+  user_profile_id string [ref: > UserProfile.id]
+  Name varchar
+  Issuer varchar
+  DateIssued date
+  ValidUntil date
+  Note: 'Extracted certifications and licenses from the CV. Now connected directly to UserProfile.'
+}
+
+Table awards_achievements {
+  id int [pk, increment]
+  user_profile_id string [ref: > UserProfile.id]
+  title varchar
+  issuer varchar
+  year int
+  description varchar
+  Note: 'Extracted awards and achievements from the CV. Now connected directly to UserProfile.'
+}
+
+Table volunteer_extracurricular {
+  id int [pk, increment]
+  user_profile_id string [ref: > UserProfile.id]
+  role varchar
+  organization varchar
+  start_date date
+  end_date date
+  description varchar
+  Note: 'Extracted volunteer and extracurricular activities. Now connected directly to UserProfile.'
+}
+
+Table scoring {
+  id int [pk, increment]
+  cv_evaluation string [ref: > cv_evaluation.id]
+  category varchar
+  score int
+  years int
+  level varchar
+  Note: 'Extracted scoring data. Now connected directly to UserProfile.'
+}
+
+Table summaries {
+  id int [pk, increment]
+  user_profile_id string [ref: > UserProfile.id]
+  type varchar
+  text varchar
+  Note: 'Extracted positive and negative summaries. Now connected directly to UserProfile.'
+}
+
+Table key_strengths {
+  id int [pk, increment]
+  user_profile_id string [ref: > UserProfile.id]
+  strength_name varchar
+  description varchar
+  Note: 'Extracted key strengths. Now connected directly to UserProfile.'
+}
+
+
+Table UserProfile {
+  id string [pk]
+  resumeUrl string
+  name string
+  email string
+  phoneNumber string
+  age number
+  nationality string
+  profilePictureUrl string
+  bio string
+  jobTypePreferences string[]
+  openToRelocation boolean
+  remotePreferences string[]
+}
+
+Table Candidate {
+  id string [pk]
+  cvFileId string
+  userId string
+}
+
+Table File {
+  id string [pk]
+  container string
+  filePath string
+  extension string
+  mbSize int
+  storageAccountName string[]
+}
+
+Table JobApplicationStepFiles {
+  id string [pk]
+  fileId string
+  jobApplicationStepId string
+}
+
+Table UserNotification {
+  id string [pk]
+  type string
+  title string
+  message string
+  timestamp timestamp
+  read boolean
+  actionUrl string
+  userId string
+}
+
+// --- Relationships ---
+
+Ref: Candidate.userId - UserProfile.id
+Ref: Candidate.cvFileId - File.id
+
+Ref: JobApplication.(jobPostName, jobPostVersion) > JobPost.(name, version)
+Ref: JobApplication.candidateId > Candidate.id
+
+Ref: JobPostStepAssignment.(jobPostName, jobPostVersion) > JobPost.(name, version)
+Ref: JobPostStepAssignment.(stepName, stepVersion) > JobPostStep.(name, version)
+
+Ref: JobPostStep.(interviewConfigurationName, interviewConfigurationVersion) > InterviewConfiguration.(name, version)
+
+Ref: InterviewConfiguration.(instructionPromptName, instructionPromptVersion) > Prompt.(name, version)
+Ref: InterviewConfiguration.(questionsPromptName, questionsPromptVersion) > Prompt.(name, version)
+Ref: InterviewConfiguration.(personalityPromptName, personalityPromptVersion) > Prompt.(name, version)
+
+Ref: JobApplicationStep.jobApplicationId > JobApplication.id
+Ref: JobApplicationStep.(jobPostStepName, jobPostStepVersion) > JobPostStep.(name, version)
+
+Ref: Interview.jobApplicationStepId - JobApplicationStep.id
+Ref: Interview.(interviewConfigurationName, interviewConfigurationVersion) > InterviewConfiguration.(name, version)
+
+Ref: Score.interviewId - Interview.id
+Ref: Feedback.interviewId - Interview.id
+
+Ref: JobApplicationStepFiles.fileId - File.id
+Ref: JobApplicationStepFiles.jobApplicationStepId > JobApplicationStep.id
+
+Ref: UserNotification.userId - UserProfile.id
+
+Ref: "certifications_licenses"."user_profile_id" < "certifications_licenses"."id"

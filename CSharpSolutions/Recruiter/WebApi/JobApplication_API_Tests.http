@@ -1,0 +1,200 @@
+### JobApplication API Tests
+### Base URL - Update this to match your running application
+@baseUrl = http://localhost:5140
+@contentType = application/json
+
+### Variables
+@jobApplicationId = 00000000-0000-0000-0000-000000000001
+@candidateId = 00000000-0000-0000-0000-000000000001
+@interviewId = 00000000-0000-0000-0000-000000000002
+@jobPostName = Software Engineer
+@jobPostVersion = 1
+
+### ===========================================
+### GET Operations
+### ===========================================
+
+### Get all job applications
+GET {{baseUrl}}/api/jobapplications
+Accept: {{contentType}}
+
+### Get job application by ID
+GET {{baseUrl}}/api/jobapplications/{{jobApplicationId}}
+Accept: {{contentType}}
+
+### Get job applications by candidate ID
+GET {{baseUrl}}/api/jobapplications/by-candidate/{{candidateId}}
+Accept: {{contentType}}
+
+### Get job applications by job post
+GET {{baseUrl}}/api/jobapplications/by-jobpost?jobPostName={{jobPostName}}&jobPostVersion={{jobPostVersion}}
+Accept: {{contentType}}
+
+### Get recent job applications (last 30 days)
+GET {{baseUrl}}/api/jobapplications/recent
+Accept: {{contentType}}
+
+### Get recent job applications (last 7 days)
+GET {{baseUrl}}/api/jobapplications/recent?days=7
+Accept: {{contentType}}
+
+### Get job applications by date range
+GET {{baseUrl}}/api/jobapplications/by-daterange?startDate=2024-01-01&endDate=2024-12-31
+Accept: {{contentType}}
+
+### Get completed job applications
+GET {{baseUrl}}/api/jobapplications/completed
+Accept: {{contentType}}
+
+### Get filtered job applications with pagination
+GET {{baseUrl}}/api/jobapplications/filtered?pageNumber=1&pageSize=10&sortBy=createdat&sortDescending=true
+Accept: {{contentType}}
+
+### Get filtered job applications with search
+GET {{baseUrl}}/api/jobapplications/filtered?searchTerm=engineer&isCompleted=false&pageNumber=1&pageSize=5
+Accept: {{contentType}}
+
+### ===========================================
+### POST Operations
+### ===========================================
+
+### Create new job application
+POST {{baseUrl}}/api/jobapplications
+Content-Type: {{contentType}}
+
+{
+  "jobPostName": "SoftwareEngineer",
+  "jobPostVersion": 1,
+  "candidateId": "{{candidateId}}",
+  "interviewId": "{{interviewId}}",
+  "completedAt": null
+}
+
+### Create job application with completion date
+POST {{baseUrl}}/api/jobapplications
+Content-Type: {{contentType}}
+
+{
+  "jobPostName": "Full Stack Developer",
+  "jobPostVersion": 2,
+  "candidateId": "{{candidateId}}",
+  "interviewId": "00000000-0000-0000-0000-000000000003",
+  "completedAt": "2024-12-15T10:30:00Z"
+}
+
+### ===========================================
+### PUT Operations
+### ===========================================
+
+### Update job application
+PUT {{baseUrl}}/api/jobapplications/{{jobApplicationId}}
+Content-Type: {{contentType}}
+
+{
+  "id": "{{jobApplicationId}}",
+  "jobPostName": "Senior Software Engineer - Updated",
+  "jobPostVersion": 1,
+  "candidateId": "{{candidateId}}",
+  "interviewId": "00000000-0000-0000-0000-000000000004",
+  "completedAt": "2024-12-20T15:45:00Z",
+  "createdAt": "2024-12-01T09:00:00Z",
+  "updatedAt": "2024-12-20T15:45:00Z"
+}
+
+### Mark job application as completed
+PUT {{baseUrl}}/api/jobapplications/{{jobApplicationId}}
+Content-Type: {{contentType}}
+
+{
+  "id": "{{jobApplicationId}}",
+  "jobPostName": "Senior Software Engineer",
+  "jobPostVersion": 1,
+  "candidateId": "{{candidateId}}",
+  "interviewId": "{{interviewId}}",
+  "completedAt": "2024-12-20T16:00:00Z",
+  "createdAt": "2024-12-01T09:00:00Z",
+  "updatedAt": "2024-12-20T16:00:00Z"
+}
+
+### ===========================================
+### DELETE Operations
+### ===========================================
+
+### Delete job application
+DELETE {{baseUrl}}/api/jobapplications/{{jobApplicationId}}
+Accept: {{contentType}}
+
+### ===========================================
+### Job Application Steps Operations
+### ===========================================
+
+### Get job application steps by job application ID
+GET {{baseUrl}}/api/jobapplications/{{jobApplicationId}}/steps
+Accept: {{contentType}}
+
+### Create job application step
+POST {{baseUrl}}/api/jobapplications/{{jobApplicationId}}/steps
+Content-Type: {{contentType}}
+
+{
+  "jobApplicationId": "{{jobApplicationId}}",
+  "jobPostStepName": "Technical Interview",
+  "jobPostStepVersion": 1,
+  "status": "pending",
+  "stepNumber": 1,
+  "startedAt": null,
+  "completedAt": null,
+  "data": null
+}
+
+### Update job application step
+PUT {{baseUrl}}/api/jobapplications/{{jobApplicationId}}/steps/00000000-0000-0000-0000-000000000002
+Content-Type: {{contentType}}
+
+{
+  "id": "00000000-0000-0000-0000-000000000002",
+  "jobApplicationId": "{{jobApplicationId}}",
+  "jobPostStepName": "Technical Interview",
+  "jobPostStepVersion": 1,
+  "status": "completed",
+  "stepNumber": 1,
+  "startedAt": "2024-12-15T10:00:00Z",
+  "completedAt": "2024-12-15T11:00:00Z",
+  "data": "{\"score\": 85, \"notes\": \"Excellent technical knowledge\"}"
+}
+
+### Delete job application step
+DELETE {{baseUrl}}/api/jobapplications/{{jobApplicationId}}/steps/00000000-0000-0000-0000-000000000002
+Accept: {{contentType}}
+
+### ===========================================
+### Error Testing
+### ===========================================
+
+### Test with invalid job application ID
+GET {{baseUrl}}/api/jobapplications/invalid-id
+Accept: {{contentType}}
+
+### Test with invalid candidate ID
+GET {{baseUrl}}/api/jobapplications/by-candidate/invalid-candidate-id
+Accept: {{contentType}}
+
+### Test creating job application with missing required fields
+POST {{baseUrl}}/api/jobapplications
+Content-Type: {{contentType}}
+
+{
+  "jobPostName": "",
+  "candidateId": ""
+}
+
+### Test updating non-existent job application
+PUT {{baseUrl}}/api/jobapplications/00000000-0000-0000-0000-000000000999
+Content-Type: {{contentType}}
+
+{
+  "id": "00000000-0000-0000-0000-000000000999",
+  "jobPostName": "Test Position",
+  "jobPostVersion": 1,
+  "candidateId": "{{candidateId}}"
+}

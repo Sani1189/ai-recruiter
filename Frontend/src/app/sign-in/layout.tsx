@@ -1,0 +1,21 @@
+import type { Metadata } from "next";
+
+import { Toaster } from "@/components/ui/sonner";
+
+export const metadata: Metadata = {
+  title: "Sign In",
+  description: "Sign in to your account",
+};
+
+export default function SignInLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <>
+      {children}
+      <Toaster />
+    </>
+  );
+}
